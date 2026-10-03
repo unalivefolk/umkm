@@ -185,12 +185,18 @@
                     </div>
                 </div>
 
-                <!-- Laba / Rugi Bersih -->
+                <!-- Laba / Rugi Bersih & Persentase Margin -->
                 <div id="profit-card" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 flex flex-col items-center justify-center relative overflow-hidden group transition-all duration-300">
                     <div id="profit-bg" class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-slate-50 dark:bg-slate-700/50 z-0 group-hover:scale-110 transition-transform duration-500"></div>
-                    <i id="profit-icon" class="ph ph-coins text-slate-400 dark:text-slate-500 text-3xl mb-2 relative z-10 ph-fill"></i>
-                    <p id="profit-label" class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 relative z-10">Laba Bersih</p>
-                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white relative z-10 tracking-tight" id="net-profit-display">Rp 0</h2>
+                    <div class="flex items-center gap-2 relative z-10 mb-1">
+                        <i id="profit-icon" class="ph ph-coins text-slate-400 dark:text-slate-500 text-2xl ph-fill"></i>
+                        <p id="profit-label" class="text-sm font-medium text-slate-500 dark:text-slate-400">Laba Bersih</p>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white relative z-10 tracking-tight mb-1" id="net-profit-display">Rp 0</h2>
+                    <!-- Badge Persentase Margin Keuntungan -->
+                    <div id="profit-percentage-badge" class="relative z-10 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all">
+                        Margin: 0%
+                    </div>
                 </div>
 
             </div>
@@ -425,7 +431,7 @@
         let pendingAction = null; 
         let transactions = { incomes: [], expenses: [] };
         let isLoginMode = true;
-        let trendChartInstance = null; // Chart instance for Line Chart
+        let trendChartInstance = null;
 
         /* ============================
            DARK MODE TOGGLE LOGIC
@@ -462,7 +468,6 @@
                 }
             }
 
-            // Update chart styling dynamically for dark/light mode
             if (trendChartInstance) {
                 const isDark = document.documentElement.classList.contains('dark');
                 const textColor = isDark ? '#94a3b8' : '#475569';
@@ -502,6 +507,7 @@
         const profitBg = document.getElementById('profit-bg');
         const profitIcon = document.getElementById('profit-icon');
         const profitLabel = document.getElementById('profit-label');
+        const profitPercentageBadge = document.getElementById('profit-percentage-badge');
         const incomeEmptyState = document.getElementById('income-empty-state');
         const expenseEmptyState = document.getElementById('expense-empty-state');
         const incomeCount = document.getElementById('income-count');
@@ -869,7 +875,6 @@
             const textColor = isDark ? '#94a3b8' : '#475569';
             const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
 
-            // Gabungkan dan urutkan semua transaksi secara kronologis
             const allTx = [...incomes, ...expenses].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
             const chartContainer = document.getElementById('chart-container');
@@ -880,7 +885,6 @@
                 chartContainer.classList.remove('hidden');
             }
 
-            // Kelompokkan pemasukan dan pengeluaran per tanggal
             const dateMap = new Map();
 
             allTx.forEach(tx => {
@@ -1005,41 +1009,54 @@
             const totalExpense = transactions.expenses.reduce((acc, curr) => acc + curr.amount, 0);
             const netProfit = totalIncome - totalExpense;
 
+            // Hitung persentase margin keuntungan (Net Profit Margin)
+            // Rumus: (Laba Bersih / Total Pemasukan) * 100, jika totalIncome > 0
+            let profitMargin = 0;
+            if (totalIncome > 0) {
+                profitMargin = (netProfit / totalIncome) * 100;
+            }
+
             totalIncomeDisplay.innerText = formatRupiah(totalIncome);
             totalExpenseDisplay.innerText = formatRupiah(totalExpense);
             
             const isNegative = netProfit < 0;
             const formattedProfit = formatRupiah(Math.abs(netProfit));
             netProfitDisplay.innerText = (isNegative ? '- ' : '') + formattedProfit;
+            
+            // Format tampilan persentase (maks 1 angka dibelakang koma jika ada desimal)
+            const formattedMargin = profitMargin.toFixed(1).replace(/\.0$/, '');
+            profitPercentageBadge.innerText = `Margin: ${isNegative ? '' : (profitMargin > 0 ? '+' : '')}${formattedMargin}%`;
 
             profitCard.className = 'bg-white dark:bg-slate-800 rounded-2xl shadow-sm border p-6 flex flex-col items-center justify-center relative overflow-hidden group transition-all duration-300 hover:shadow-md';
             profitBg.className = 'absolute -right-4 -top-4 w-24 h-24 rounded-full z-0 group-hover:scale-110 transition-transform duration-500';
-            profitIcon.className = 'text-4xl mb-2 relative z-10 ph-fill';
+            profitIcon.className = 'text-2xl ph-fill';
             
             if (netProfit > 0) {
                 profitCard.classList.add('border-emerald-200', 'dark:border-emerald-800/50');
                 profitBg.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20');
                 profitIcon.classList.add('text-emerald-500', 'dark:text-emerald-400', 'ph-smiley');
-                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-emerald-600 dark:text-emerald-400 tracking-tight';
+                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-emerald-600 dark:text-emerald-400 tracking-tight mb-1';
                 profitLabel.innerText = "Laba Bersih (Untung)";
+                profitPercentageBadge.className = 'relative z-10 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 transition-all';
             } else if (netProfit < 0) {
                 profitCard.classList.add('border-rose-200', 'dark:border-rose-800/50');
                 profitBg.classList.add('bg-rose-50', 'dark:bg-rose-900/20');
                 profitIcon.classList.add('text-rose-500', 'dark:text-rose-400', 'ph-smiley-sad');
-                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-rose-600 dark:text-rose-400 tracking-tight';
+                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-rose-600 dark:text-rose-400 tracking-tight mb-1';
                 profitLabel.innerText = "Rugi Bersih";
+                profitPercentageBadge.className = 'relative z-10 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 transition-all';
             } else {
                 profitCard.classList.add('border-slate-100', 'dark:border-slate-700');
                 profitBg.classList.add('bg-slate-50', 'dark:bg-slate-700/50');
                 profitIcon.classList.add('text-slate-400', 'dark:text-slate-500', 'ph-coins');
-                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-slate-800 dark:text-white tracking-tight';
+                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-slate-800 dark:text-white tracking-tight mb-1';
                 profitLabel.innerText = "Laba Bersih";
+                profitPercentageBadge.className = 'relative z-10 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all';
             }
 
             renderTable(transactions.incomes, incomeList, 'income', incomeEmptyState, incomeCount);
             renderTable(transactions.expenses, expenseList, 'expense', expenseEmptyState, expenseCount);
             
-            // Render Line Chart untuk perbandingan Pemasukan vs Pengeluaran
             updateChartUI(transactions.incomes, transactions.expenses);
         }
 
@@ -1092,7 +1109,7 @@
         }
 
         incomeForm.addEventListener('submit', (e) => addTransaction(e, 'income'));
-        expenseForm.addEventListener('submit', (e) => addTransaction(e, 'expense'));
+        expenseForm.addEventListener('submit', (e) => addTransaction, (e) => addTransaction(e, 'expense'));
 
         updateUI();
         initFirebase();
