@@ -147,8 +147,8 @@
                         <i class="ph ph-spinner-gap animate-spin"></i> <span class="hidden sm:inline">Menghubungkan...</span>
                     </span>
                     
-                    <button onclick="clearAllData()" class="text-sm bg-black/20 hover:bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5" title="Hapus Semua Data">
-                        <i class="ph ph-trash"></i> <span class="hidden sm:inline">Reset</span>
+                    <button onclick="clearAllData()" class="text-sm bg-black/20 hover:bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5" title="Hapus Data Bulan Ini">
+                        <i class="ph ph-trash"></i> <span class="hidden sm:inline">Reset Bulan Ini</span>
                     </button>
                     <!-- Tombol Keluar / Logout -->
                     <button onclick="handleLogout()" class="text-sm bg-rose-500 hover:bg-rose-600 shadow-sm px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5" title="Keluar">
@@ -170,7 +170,7 @@
                         <i class="ph ph-trend-up text-3xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Total Pemasukan</p>
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Pemasukan (Bulan Ini)</p>
                         <h2 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight" id="total-income-display">Rp 0</h2>
                     </div>
                 </div>
@@ -181,7 +181,7 @@
                         <i class="ph ph-trend-down text-3xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Total Pengeluaran</p>
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Pengeluaran (Bulan Ini)</p>
                         <h2 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight" id="total-expense-display">Rp 0</h2>
                     </div>
                 </div>
@@ -374,7 +374,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, deleteDoc, updateDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, deleteDoc, updateDoc, onSnapshot, collection, addDoc, query, where, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // APP ID - IMPORTANT: Set back to 'demo-labarugi-app' so old data appears
         const appId = 'demo-labarugi-app';
@@ -704,14 +704,22 @@
             const transRef = collection(db, 'artifacts', appId, 'users', uid, 'transactions');
             syncStatusUI.innerHTML = `<i class="ph ph-spinner-gap animate-spin"></i> <span class="hidden sm:inline">Memuat...</span>`;
 
-            unsubscribe = onSnapshot(transRef, (snapshot) => {
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+            const q = query(
+                transRef, 
+                where("createdAt", ">=", startOfMonth),
+                orderBy("createdAt", "desc")
+            );
+
+            unsubscribe = onSnapshot(q, (snapshot) => {
                 const allDocs = [];
                 snapshot.forEach(doc => {
                     allDocs.push({ id: doc.id, ...doc.data() });
                 });
 
-                allDocs.sort((a, b) => b.createdAt - a.createdAt);
-
+                // (Urutkan ulang jika perlu, tapi query orderBy sudah menanganinya)
                 transactions.incomes = allDocs.filter(d => d.type === 'income');
                 transactions.expenses = allDocs.filter(d => d.type === 'expense');
 
@@ -768,15 +776,20 @@
         }
 
         async function clearAllData() {
-            showModal('Reset Semua Data', 'PERINGATAN: Semua data laba rugi akan dihapus permanen. Lanjutkan?', async () => {
+            showModal('Reset Data Bulan Ini', 'PERINGATAN: Semua data laba rugi di bulan ini akan dihapus permanen. Lanjutkan?', async () => {
                 if (!currentUser || !db) return;
                 syncStatusUI.innerHTML = `<i class="ph ph-spinner-gap animate-spin"></i> <span class="hidden sm:inline">Mereset...</span>`;
                 try {
+                    const batch = writeBatch(db);
                     const allTrans = [...transactions.incomes, ...transactions.expenses];
+                    
                     for (const t of allTrans) {
                         const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions', t.id);
-                        await deleteDoc(docRef);
+                        batch.delete(docRef);
                     }
+                    
+                    // Eksekusi semua perintah hapus sekaligus
+                    await batch.commit();
                 } catch(err) {
                     console.error("Error clearing data:", err);
                 }
