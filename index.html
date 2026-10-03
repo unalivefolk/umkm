@@ -3,15 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallet - Pintar Kelola Laba Rugi UMKM</title>
+    <title>Wallet</title>
     <!-- Tailwind CSS for rapid styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configure Tailwind for Dark Mode (Class Strategy) -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+
     <!-- Phosphor Icons for UI elements -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         /* Custom styles for smooth transitions and scrollbars */
         body {
             font-family: 'Inter', sans-serif;
+            /* Transition for smooth dark mode switching */
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         .fade-in {
             animation: fadeIn 0.3s ease-in-out;
@@ -37,47 +47,68 @@
         .table-container::-webkit-scrollbar-track {
             background: #f1f5f9;
         }
+        /* Dark mode scrollbar track */
+        .dark .table-container::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
         .table-container::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
         }
+        /* Dark mode scrollbar thumb */
+        .dark .table-container::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
         .table-container::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+        .dark .table-container::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
     </style>
+    
+    <!-- Dark Mode Initialization Script (Prevents flash of wrong theme) -->
+    <script>
+        // Check local storage or system preference on load
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-indigo-50/50 text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-gradient-to-br from-slate-50 to-indigo-50/50 dark:from-slate-900 dark:to-indigo-950 text-slate-800 dark:text-slate-200 antialiased min-h-screen flex flex-col transition-colors duration-300">
 
     <!-- Layar Autentikasi (Muncul ketika belum login) -->
-    <div id="auth-screen" class="flex-grow flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border border-slate-100 fade-in">
+    <div id="auth-screen" class="flex-grow flex items-center justify-center p-4 relative z-10">
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg w-full max-w-md border border-slate-100 dark:border-slate-700 fade-in transition-colors duration-300">
             <div class="text-center mb-6">
-                <div class="inline-block bg-indigo-50 p-3 rounded-full mb-3">
-                    <i class="ph ph-wallet text-4xl text-indigo-600"></i>
+                <div class="inline-block bg-indigo-50 dark:bg-indigo-900/50 p-3 rounded-full mb-3">
+                    <i class="ph ph-wallet text-4xl text-indigo-600 dark:text-indigo-400"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Wallet</h2>
-                <p class="text-slate-500 text-sm mt-1" id="auth-subtitle">Masuk untuk mengelola keuanganmu</p>
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Wallet</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1" id="auth-subtitle">Masuk untuk mengelola keuanganmu</p>
             </div>
             
-            <!-- Alert Notifikasi Error Auth (Disembunyikan secara default) -->
-            <div id="auth-error-alert" class="hidden mb-5 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-r-lg flex items-start gap-2 transition-all">
+            <!-- Alert Notifikasi Error Auth -->
+            <div id="auth-error-alert" class="hidden mb-5 p-3 bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-red-700 dark:text-red-400 text-sm rounded-r-lg flex items-start gap-2 transition-all">
                 <i class="ph ph-warning-circle text-lg mt-0.5"></i>
                 <span id="auth-error-text">Email atau password salah.</span>
             </div>
             
             <form id="auth-form" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="ph ph-envelope-simple"></i></span>
-                        <input type="email" id="auth-email" required placeholder="email@contoh.com" class="w-full pl-10 px-4 py-2.5 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
+                        <input type="email" id="auth-email" required placeholder="email@contoh.com" class="w-full pl-10 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:text-white transition-all text-sm">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="ph ph-lock-key"></i></span>
-                        <input type="password" id="auth-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full pl-10 px-4 py-2.5 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
+                        <input type="password" id="auth-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full pl-10 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:text-white transition-all text-sm">
                     </div>
                 </div>
                 <button type="submit" id="auth-submit-btn" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-medium py-2.5 rounded-lg transition-all shadow-md hover:shadow-lg mt-2 flex justify-center items-center gap-2">
@@ -85,18 +116,18 @@
                 </button>
             </form>
             
-            <div class="mt-6 text-center text-sm text-slate-600 pt-4 border-t border-slate-100">
+            <div class="mt-6 text-center text-sm text-slate-600 dark:text-slate-400 pt-4 border-t border-slate-100 dark:border-slate-700">
                 <span id="auth-toggle-text">Belum punya akun?</span>
-                <button type="button" id="auth-toggle-btn" class="text-indigo-600 font-bold hover:text-indigo-800 hover:underline ml-1 transition-colors">Daftar di sini</button>
+                <button type="button" id="auth-toggle-btn" class="text-indigo-600 dark:text-indigo-400 font-bold hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline ml-1 transition-colors">Daftar di sini</button>
             </div>
         </div>
     </div>
 
-    <!-- Wrapper Aplikasi Utama (Disembunyikan secara default saat belum login) -->
+    <!-- Wrapper Aplikasi Utama -->
     <div id="app-wrapper" class="hidden flex-col min-h-screen w-full fade-in">
         
         <!-- Header -->
-        <header class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md sticky top-0 z-50">
+        <header class="bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-900 dark:to-violet-900 text-white shadow-md sticky top-0 z-50 transition-colors duration-300">
             <div class="container mx-auto px-4 py-4 flex justify-between items-center max-w-6xl">
                 <div class="flex items-center gap-2">
                     <i class="ph ph-wallet text-3xl"></i>
@@ -104,10 +135,18 @@
                 </div>
                 
                 <div class="flex items-center gap-2 sm:gap-3">
+                    
+                    <!-- Dark Mode Toggle Button -->
+                    <button id="theme-toggle" type="button" class="text-sm bg-black/20 hover:bg-black/30 backdrop-blur-sm p-1.5 rounded-lg transition-colors flex items-center justify-center h-8 w-8" title="Toggle Dark Mode">
+                        <i id="theme-toggle-dark-icon" class="ph ph-moon hidden text-lg"></i>
+                        <i id="theme-toggle-light-icon" class="ph ph-sun hidden text-lg"></i>
+                    </button>
+
                     <!-- Status Sinkronisasi Cloud -->
                     <span id="sync-status" class="text-xs bg-black/20 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all">
                         <i class="ph ph-spinner-gap animate-spin"></i> <span class="hidden sm:inline">Menghubungkan...</span>
                     </span>
+                    
                     <button onclick="clearAllData()" class="text-sm bg-black/20 hover:bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5" title="Hapus Semua Data">
                         <i class="ph ph-trash"></i> <span class="hidden sm:inline">Reset</span>
                     </button>
@@ -126,33 +165,33 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 
                 <!-- Total Pendapatan -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-5 hover:shadow-md transition-shadow">
-                    <div class="bg-emerald-100 text-emerald-600 p-4 rounded-xl">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 flex items-center gap-5 hover:shadow-md transition-all duration-300">
+                    <div class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 p-4 rounded-xl">
                         <i class="ph ph-trend-up text-3xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-slate-500 mb-1">Total Pemasukan</p>
-                        <h2 class="text-2xl font-bold text-slate-800 tracking-tight" id="total-income-display">Rp 0</h2>
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Total Pemasukan</p>
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight" id="total-income-display">Rp 0</h2>
                     </div>
                 </div>
 
                 <!-- Total Pengeluaran -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-5 hover:shadow-md transition-shadow">
-                    <div class="bg-rose-100 text-rose-600 p-4 rounded-xl">
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 flex items-center gap-5 hover:shadow-md transition-all duration-300">
+                    <div class="bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 p-4 rounded-xl">
                         <i class="ph ph-trend-down text-3xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-slate-500 mb-1">Total Pengeluaran</p>
-                        <h2 class="text-2xl font-bold text-slate-800 tracking-tight" id="total-expense-display">Rp 0</h2>
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Total Pengeluaran</p>
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight" id="total-expense-display">Rp 0</h2>
                     </div>
                 </div>
 
                 <!-- Laba / Rugi Bersih -->
-                <div id="profit-card" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col items-center justify-center relative overflow-hidden group transition-colors duration-300">
-                    <div id="profit-bg" class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-slate-50 z-0 group-hover:scale-110 transition-transform duration-500"></div>
-                    <i id="profit-icon" class="ph ph-coins text-slate-400 text-3xl mb-2 relative z-10 ph-fill"></i>
-                    <p id="profit-label" class="text-sm font-medium text-slate-500 mb-1 relative z-10">Laba Bersih</p>
-                    <h2 class="text-2xl font-bold text-slate-800 relative z-10 tracking-tight" id="net-profit-display">Rp 0</h2>
+                <div id="profit-card" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 flex flex-col items-center justify-center relative overflow-hidden group transition-all duration-300">
+                    <div id="profit-bg" class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-slate-50 dark:bg-slate-700/50 z-0 group-hover:scale-110 transition-transform duration-500"></div>
+                    <i id="profit-icon" class="ph ph-coins text-slate-400 dark:text-slate-500 text-3xl mb-2 relative z-10 ph-fill"></i>
+                    <p id="profit-label" class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 relative z-10">Laba Bersih</p>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white relative z-10 tracking-tight" id="net-profit-display">Rp 0</h2>
                 </div>
 
             </div>
@@ -161,24 +200,24 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                 
                 <!-- Pemasukan Form -->
-                <section class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div class="bg-emerald-50/50 border-b border-emerald-100 p-5">
-                        <h3 class="text-lg font-semibold text-emerald-800 flex items-center gap-2">
+                <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+                    <div class="bg-emerald-50/50 dark:bg-emerald-900/20 border-b border-emerald-100 dark:border-emerald-800/50 p-5">
+                        <h3 class="text-lg font-semibold text-emerald-800 dark:text-emerald-400 flex items-center gap-2">
                             <i class="ph ph-plus-circle text-xl"></i> Catat Pemasukan
                         </h3>
                     </div>
                     <form id="income-form" class="p-6 space-y-5">
                         <div>
-                            <label for="income-desc" class="block text-sm font-medium text-slate-700 mb-1.5">Keterangan (Nama Barang/Jasa)</label>
+                            <label for="income-desc" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Keterangan (Nama Barang/Jasa)</label>
                             <input type="text" id="income-desc" required placeholder="Contoh: Sepatu Sneakers x2" 
-                                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-sm">
+                                   class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none dark:text-white transition-all text-sm">
                         </div>
                         <div>
-                            <label for="income-amount" class="block text-sm font-medium text-slate-700 mb-1.5">Jumlah (Rp)</label>
+                            <label for="income-amount" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Jumlah (Rp)</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500 font-medium">Rp</span>
                                 <input type="number" id="income-amount" required min="0" placeholder="0" 
-                                       class="w-full pl-12 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-sm">
+                                       class="w-full pl-12 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none dark:text-white transition-all text-sm">
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-lg transition-colors flex justify-center items-center gap-2 shadow-sm hover:shadow mt-2">
@@ -188,24 +227,24 @@
                 </section>
 
                 <!-- Pengeluaran Form -->
-                <section class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div class="bg-rose-50/50 border-b border-rose-100 p-5">
-                        <h3 class="text-lg font-semibold text-rose-800 flex items-center gap-2">
+                <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+                    <div class="bg-rose-50/50 dark:bg-rose-900/20 border-b border-rose-100 dark:border-rose-800/50 p-5">
+                        <h3 class="text-lg font-semibold text-rose-800 dark:text-rose-400 flex items-center gap-2">
                             <i class="ph ph-minus-circle text-xl"></i> Catat Pengeluaran
                         </h3>
                     </div>
                     <form id="expense-form" class="p-6 space-y-5">
                         <div>
-                            <label for="expense-desc" class="block text-sm font-medium text-slate-700 mb-1.5">Keterangan (Biaya/Modal)</label>
+                            <label for="expense-desc" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Keterangan (Biaya/Modal)</label>
                             <input type="text" id="expense-desc" required placeholder="Contoh: Beli Kardus Packing, Ongkir" 
-                                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all text-sm">
+                                   class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none dark:text-white transition-all text-sm">
                         </div>
                         <div>
-                            <label for="expense-amount" class="block text-sm font-medium text-slate-700 mb-1.5">Jumlah (Rp)</label>
+                            <label for="expense-amount" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Jumlah (Rp)</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500 font-medium">Rp</span>
                                 <input type="number" id="expense-amount" required min="0" placeholder="0" 
-                                       class="w-full pl-12 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all text-sm">
+                                       class="w-full pl-12 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none dark:text-white transition-all text-sm">
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-medium py-3 rounded-lg transition-colors flex justify-center items-center gap-2 shadow-sm hover:shadow mt-2">
@@ -220,54 +259,54 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                 
                 <!-- Tabel Pemasukan -->
-                <section class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
-                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h3 class="font-semibold text-slate-800">Riwayat Pemasukan</h3>
-                        <span class="text-xs font-medium bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full" id="income-count">0 item</span>
+                <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col transition-colors duration-300">
+                    <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+                        <h3 class="font-semibold text-slate-800 dark:text-slate-200">Riwayat Pemasukan</h3>
+                        <span class="text-xs font-medium bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 rounded-full border dark:border-emerald-800" id="income-count">0 item</span>
                     </div>
                     <div class="overflow-x-auto table-container flex-grow">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-white text-slate-400 text-xs uppercase tracking-wider border-b border-slate-100">
+                                <tr class="bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100 dark:border-slate-700">
                                     <th class="px-6 py-4 font-medium">Tanggal</th>
                                     <th class="px-6 py-4 font-medium">Keterangan</th>
                                     <th class="px-6 py-4 font-medium text-right">Jumlah</th>
                                     <th class="px-6 py-4 font-medium text-center w-16">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="income-list" class="divide-y divide-slate-50 text-sm">
-                                <!-- Data pemasukan akan masuk kesini -->
+                            <tbody id="income-list" class="divide-y divide-slate-50 dark:divide-slate-700/50 text-sm">
+                                <!-- Data -->
                             </tbody>
                         </table>
                     </div>
-                    <div id="income-empty-state" class="py-14 text-center text-slate-400 hidden flex-col items-center justify-center">
+                    <div id="income-empty-state" class="py-14 text-center text-slate-400 dark:text-slate-500 hidden flex-col items-center justify-center">
                         <i class="ph ph-receipt text-5xl mb-3 opacity-20"></i>
                         <p class="text-sm">Belum ada data pemasukan.</p>
                     </div>
                 </section>
 
                 <!-- Tabel Pengeluaran -->
-                <section class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
-                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h3 class="font-semibold text-slate-800">Riwayat Pengeluaran</h3>
-                        <span class="text-xs font-medium bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full" id="expense-count">0 item</span>
+                <section class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col transition-colors duration-300">
+                    <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+                        <h3 class="font-semibold text-slate-800 dark:text-slate-200">Riwayat Pengeluaran</h3>
+                        <span class="text-xs font-medium bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-400 px-2.5 py-1 rounded-full border dark:border-rose-800" id="expense-count">0 item</span>
                     </div>
                     <div class="overflow-x-auto table-container flex-grow">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-white text-slate-400 text-xs uppercase tracking-wider border-b border-slate-100">
+                                <tr class="bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100 dark:border-slate-700">
                                     <th class="px-6 py-4 font-medium">Tanggal</th>
                                     <th class="px-6 py-4 font-medium">Keterangan</th>
                                     <th class="px-6 py-4 font-medium text-right">Jumlah</th>
                                     <th class="px-6 py-4 font-medium text-center w-16">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="expense-list" class="divide-y divide-slate-50 text-sm">
-                                <!-- Data pengeluaran akan masuk kesini -->
+                            <tbody id="expense-list" class="divide-y divide-slate-50 dark:divide-slate-700/50 text-sm">
+                                <!-- Data -->
                             </tbody>
                         </table>
                     </div>
-                    <div id="expense-empty-state" class="py-14 text-center text-slate-400 hidden flex-col items-center justify-center">
+                    <div id="expense-empty-state" class="py-14 text-center text-slate-400 dark:text-slate-500 hidden flex-col items-center justify-center">
                         <i class="ph ph-receipt text-5xl mb-3 opacity-20"></i>
                         <p class="text-sm">Belum ada data pengeluaran.</p>
                     </div>
@@ -276,45 +315,38 @@
             </div>
         </main>
 
-        <footer class="bg-white border-t border-slate-200 py-6 text-center text-slate-500 text-sm mt-auto">
+        <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-slate-500 dark:text-slate-400 text-sm mt-auto transition-colors duration-300">
             <p><strong>Wallet</strong> - Solusi Pembukuan UMKM &copy; 2026. Data diamankan dengan Cloud.</p>
         </footer>
 
-    </div> <!-- Penutup elemen app-wrapper -->
+    </div> 
 
-    <!-- Custom Modal Container (Replaces alert/confirm) -->
+    <!-- Custom Modal Container -->
     <div id="custom-modal" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center backdrop-blur-sm transition-opacity opacity-0">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 overflow-hidden transform scale-95 transition-transform duration-300">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full mx-4 overflow-hidden transform scale-95 transition-all duration-300 border dark:border-slate-700">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-3">
                     <div id="modal-icon" class="text-2xl"></div>
-                    <h3 id="modal-title" class="text-lg font-bold text-slate-800">Konfirmasi</h3>
+                    <h3 id="modal-title" class="text-lg font-bold text-slate-800 dark:text-white">Konfirmasi</h3>
                 </div>
-                <p id="modal-message" class="text-slate-600 mb-6 text-sm">Apakah Anda yakin?</p>
+                <p id="modal-message" class="text-slate-600 dark:text-slate-300 mb-6 text-sm">Apakah Anda yakin?</p>
                 <div class="flex justify-end gap-3">
-                    <button id="modal-cancel-btn" class="px-4 py-2.5 text-slate-600 text-sm font-medium hover:bg-slate-100 rounded-lg transition-colors">Batal</button>
+                    <button id="modal-cancel-btn" class="px-4 py-2.5 text-slate-600 dark:text-slate-400 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">Batal</button>
                     <button id="modal-confirm-btn" class="px-4 py-2.5 text-sm font-medium rounded-lg transition-colors shadow-sm">Ya, Lanjutkan</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Application Script -->
     <script type="module">
-        // Menggunakan SDK Firebase versi terbaru
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            signOut
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, deleteDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Menggunakan id lama agar data yang sudah diinput sebelumnya kembali terbaca
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'demo-labarugi-app';
+        // APP ID - IMPORTANT: Set back to 'demo-labarugi-app' so old data appears
+        const appId = 'demo-labarugi-app';
         
-        // Konfigurasi Firebase Anda
         const firebaseConfig = {
             apiKey: "AIzaSyCrSvja2GKy_2h4FtTGeWVIwB3VK90qeeo",
             authDomain: "note-c2178.firebaseapp.com",
@@ -328,12 +360,52 @@
         let currentUser = null;
         let unsubscribe = null;
         let pendingAction = null; 
-
-        // State management
         let transactions = { incomes: [], expenses: [] };
         let isLoginMode = true;
 
-        // DOM Elements - Auth
+        /* ============================
+           DARK MODE TOGGLE LOGIC
+           ============================ */
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        // Set initial icon based on theme
+        if (document.documentElement.classList.contains('dark')) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            // toggle icons
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            // if set via local storage previously
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                // if NOT set via local storage previously
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
+        });
+
+        /* ============================
+           DOM ELEMENTS
+           ============================ */
         const authScreen = document.getElementById('auth-screen');
         const appWrapper = document.getElementById('app-wrapper');
         const authForm = document.getElementById('auth-form');
@@ -346,7 +418,6 @@
         const authErrorAlert = document.getElementById('auth-error-alert');
         const authErrorText = document.getElementById('auth-error-text');
         
-        // DOM Elements - App
         const incomeForm = document.getElementById('income-form');
         const expenseForm = document.getElementById('expense-form');
         const incomeList = document.getElementById('income-list');
@@ -364,7 +435,6 @@
         const expenseCount = document.getElementById('expense-count');
         const syncStatusUI = document.getElementById('sync-status');
 
-        // DOM Elements - Modal
         const modal = document.getElementById('custom-modal');
         const modalTitle = document.getElementById('modal-title');
         const modalMessage = document.getElementById('modal-message');
@@ -384,7 +454,9 @@
             return date.toLocaleDateString('id-ID', options);
         };
 
-        // Modal Functions
+        /* ============================
+           MODAL LOGIC
+           ============================ */
         function showModal(title, message, confirmCallback, isDestructive = false) {
             modalTitle.innerText = title;
             modalMessage.innerText = message;
@@ -399,7 +471,7 @@
             }
             
             modal.classList.remove('hidden');
-            void modal.offsetWidth; // trigger reflow
+            void modal.offsetWidth; 
             modal.classList.remove('opacity-0');
             modal.querySelector('div').classList.remove('scale-95');
         }
@@ -416,6 +488,9 @@
             hideModal();
         });
 
+        /* ============================
+           FIREBASE LOGIC
+           ============================ */
         function initFirebase() {
             try {
                 app = initializeApp(firebaseConfig);
@@ -433,21 +508,18 @@
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     currentUser = user;
-                    // User login: Tampilkan aplikasi, sembunyikan form login
                     authScreen.classList.add('hidden');
                     appWrapper.classList.remove('hidden');
                     appWrapper.classList.add('flex');
-                    authErrorAlert.classList.add('hidden'); // bersihkan alert error
+                    authErrorAlert.classList.add('hidden');
                     setupRealtimeListener(user.uid);
                 } else {
                     currentUser = null;
                     if(unsubscribe) unsubscribe();
-                    // User belum login/logout: Tampilkan form login, sembunyikan aplikasi
                     appWrapper.classList.add('hidden');
                     appWrapper.classList.remove('flex');
                     authScreen.classList.remove('hidden');
                     
-                    // Reset UI
                     transactions = { incomes: [], expenses: [] };
                     updateUI();
                 }
@@ -455,10 +527,9 @@
         }
 
         function setupAuthUI() {
-            // Toggle Login / Register
             authToggleBtn.addEventListener('click', () => {
                 isLoginMode = !isLoginMode;
-                authErrorAlert.classList.add('hidden'); // Sembunyikan error saat toggle
+                authErrorAlert.classList.add('hidden');
                 authEmail.value = '';
                 authPassword.value = '';
                 
@@ -475,11 +546,8 @@
                 }
             });
 
-            // Handle Submit Form
             authForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
-                // Sembunyikan error sebelumnya
                 authErrorAlert.classList.add('hidden');
                 authErrorAlert.classList.remove('shake');
                 
@@ -501,8 +569,6 @@
                     authPassword.value = '';
                 } catch (error) {
                     console.error("Auth Error:", error);
-                    
-                    // Mapping Error untuk ditampilkan di Alert
                     let errorMsg = "Terjadi kesalahan. Silakan coba lagi.";
                     if (error.code === 'auth/email-already-in-use') {
                         errorMsg = "Email sudah terdaftar. Silakan pindah ke halaman Masuk.";
@@ -516,12 +582,10 @@
                         errorMsg = "Koneksi internet terputus.";
                     }
                     
-                    // Tampilkan pesan error di atas form
                     authErrorText.innerText = errorMsg;
                     authErrorAlert.classList.remove('hidden');
                     
-                    // Tambahkan efek getar kecil agar pengguna sadar ada error
-                    void authErrorAlert.offsetWidth; // trigger reflow
+                    void authErrorAlert.offsetWidth; 
                     authErrorAlert.classList.add('shake');
                     
                 } finally {
@@ -533,14 +597,9 @@
         }
 
         async function handleLogout() {
-            showModal(
-                'Keluar Akun', 
-                'Apakah Anda yakin ingin keluar dari Wallet?', 
-                async () => {
-                    if (auth) await signOut(auth);
-                },
-                true // jadikan tombol merah
-            );
+            showModal('Keluar Akun', 'Apakah Anda yakin ingin keluar dari Wallet?', async () => {
+                if (auth) await signOut(auth);
+            }, true);
         }
 
         function setupRealtimeListener(uid) {
@@ -570,7 +629,6 @@
 
         async function addTransaction(e, type) {
             e.preventDefault();
-            
             const descInput = document.getElementById(`${type}-desc`);
             const amountInput = document.getElementById(`${type}-amount`);
             const desc = descInput.value.trim();
@@ -598,49 +656,41 @@
         }
 
         async function deleteTransaction(id, type) {
-            showModal(
-                'Hapus Catatan',
-                'Yakin ingin menghapus catatan transaksi ini?',
-                async () => {
-                    if (!currentUser || !db) return;
-                    syncStatusUI.innerHTML = `<i class="ph ph-spinner-gap animate-spin"></i> <span class="hidden sm:inline">Menghapus...</span>`;
-                    try {
-                        const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions', id);
-                        await deleteDoc(docRef);
-                    } catch(err) {
-                        console.error("Error deleting doc:", err);
-                    }
-                },
-                true // Is destructive (Red button)
-            );
+            showModal('Hapus Catatan', 'Yakin ingin menghapus catatan transaksi ini?', async () => {
+                if (!currentUser || !db) return;
+                syncStatusUI.innerHTML = `<i class="ph ph-spinner-gap animate-spin"></i> <span class="hidden sm:inline">Menghapus...</span>`;
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions', id);
+                    await deleteDoc(docRef);
+                } catch(err) {
+                    console.error("Error deleting doc:", err);
+                }
+            }, true);
         }
 
         async function clearAllData() {
-            showModal(
-                'Reset Semua Data',
-                'PERINGATAN: Semua data laba rugi akan dihapus permanen. Lanjutkan?',
-                async () => {
-                    if (!currentUser || !db) return;
-                    syncStatusUI.innerHTML = `<i class="ph ph-spinner-gap animate-spin"></i> <span class="hidden sm:inline">Mereset...</span>`;
-                    try {
-                        const allTrans = [...transactions.incomes, ...transactions.expenses];
-                        for (const t of allTrans) {
-                            const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions', t.id);
-                            await deleteDoc(docRef);
-                        }
-                    } catch(err) {
-                        console.error("Error clearing data:", err);
+            showModal('Reset Semua Data', 'PERINGATAN: Semua data laba rugi akan dihapus permanen. Lanjutkan?', async () => {
+                if (!currentUser || !db) return;
+                syncStatusUI.innerHTML = `<i class="ph ph-spinner-gap animate-spin"></i> <span class="hidden sm:inline">Mereset...</span>`;
+                try {
+                    const allTrans = [...transactions.incomes, ...transactions.expenses];
+                    for (const t of allTrans) {
+                        const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions', t.id);
+                        await deleteDoc(docRef);
                     }
-                },
-                true // Is destructive
-            );
+                } catch(err) {
+                    console.error("Error clearing data:", err);
+                }
+            }, true);
         }
 
-        // Ekspos ke global agar bisa dipanggil HTML onclick
         window.deleteTransaction = deleteTransaction;
         window.clearAllData = clearAllData;
         window.handleLogout = handleLogout;
 
+        /* ============================
+           UI RENDER LOGIC
+           ============================ */
         function updateUI() {
             const totalIncome = transactions.incomes.reduce((acc, curr) => acc + curr.amount, 0);
             const totalExpense = transactions.expenses.reduce((acc, curr) => acc + curr.amount, 0);
@@ -653,28 +703,28 @@
             const formattedProfit = formatRupiah(Math.abs(netProfit));
             netProfitDisplay.innerText = (isNegative ? '- ' : '') + formattedProfit;
 
-            // Reset classes
-            profitCard.className = 'bg-white rounded-2xl shadow-sm border p-6 flex flex-col items-center justify-center relative overflow-hidden group transition-colors duration-300 hover:shadow-md';
+            // Reset profit card classes (keeping structural & dark mode base classes)
+            profitCard.className = 'bg-white dark:bg-slate-800 rounded-2xl shadow-sm border p-6 flex flex-col items-center justify-center relative overflow-hidden group transition-all duration-300 hover:shadow-md';
             profitBg.className = 'absolute -right-4 -top-4 w-24 h-24 rounded-full z-0 group-hover:scale-110 transition-transform duration-500';
             profitIcon.className = 'text-4xl mb-2 relative z-10 ph-fill';
             
             if (netProfit > 0) {
-                profitCard.classList.add('border-emerald-200');
-                profitBg.classList.add('bg-emerald-50');
-                profitIcon.classList.add('text-emerald-500', 'ph-smiley');
-                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-emerald-600 tracking-tight';
+                profitCard.classList.add('border-emerald-200', 'dark:border-emerald-800/50');
+                profitBg.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20');
+                profitIcon.classList.add('text-emerald-500', 'dark:text-emerald-400', 'ph-smiley');
+                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-emerald-600 dark:text-emerald-400 tracking-tight';
                 profitLabel.innerText = "Laba Bersih (Untung)";
             } else if (netProfit < 0) {
-                profitCard.classList.add('border-rose-200');
-                profitBg.classList.add('bg-rose-50');
-                profitIcon.classList.add('text-rose-500', 'ph-smiley-sad');
-                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-rose-600 tracking-tight';
+                profitCard.classList.add('border-rose-200', 'dark:border-rose-800/50');
+                profitBg.classList.add('bg-rose-50', 'dark:bg-rose-900/20');
+                profitIcon.classList.add('text-rose-500', 'dark:text-rose-400', 'ph-smiley-sad');
+                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-rose-600 dark:text-rose-400 tracking-tight';
                 profitLabel.innerText = "Rugi Bersih";
             } else {
-                profitCard.classList.add('border-slate-100');
-                profitBg.classList.add('bg-slate-50');
-                profitIcon.classList.add('text-slate-400', 'ph-coins');
-                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-slate-800 tracking-tight';
+                profitCard.classList.add('border-slate-100', 'dark:border-slate-700');
+                profitBg.classList.add('bg-slate-50', 'dark:bg-slate-700/50');
+                profitIcon.classList.add('text-slate-400', 'dark:text-slate-500', 'ph-coins');
+                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-slate-800 dark:text-white tracking-tight';
                 profitLabel.innerText = "Laba Bersih";
             }
 
@@ -688,25 +738,27 @@
 
             if (dataArray.length === 0) {
                 emptyStateElement.classList.remove('hidden');
+                emptyStateElement.classList.add('flex');
                 listElement.parentElement.classList.add('hidden');
             } else {
                 emptyStateElement.classList.add('hidden');
+                emptyStateElement.classList.remove('flex');
                 listElement.parentElement.classList.remove('hidden');
 
                 dataArray.forEach(item => {
                     const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-50/80 transition-colors fade-in border-b border-slate-100 last:border-0';
+                    tr.className = 'hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors fade-in border-b border-slate-100 dark:border-slate-700/50 last:border-0';
                     
-                    const amountClass = type === 'income' ? 'text-emerald-600' : 'text-rose-600';
+                    const amountClass = type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400';
                     const sign = type === 'income' ? '+' : '-';
 
                     tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-slate-500 text-xs">${item.date}</td>
-                        <td class="px-6 py-4 font-medium text-slate-700">${item.desc}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-slate-500 dark:text-slate-400 text-xs">${item.date}</td>
+                        <td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-200">${item.desc}</td>
                         <td class="px-6 py-4 text-right font-bold ${amountClass}">${sign} ${formatRupiah(item.amount)}</td>
                         <td class="px-6 py-4 text-center">
                             <button onclick="window.deleteTransaction('${item.id}', '${type}')" 
-                                    class="text-slate-400 hover:text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition-colors"
+                                    class="text-slate-400 dark:text-slate-500 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 p-2 rounded-lg transition-colors"
                                     title="Hapus Transaksi">
                                 <i class="ph ph-trash text-lg"></i>
                             </button>
@@ -717,11 +769,9 @@
             }
         }
 
-        // Event Listeners for Forms
         incomeForm.addEventListener('submit', (e) => addTransaction(e, 'income'));
         expenseForm.addEventListener('submit', (e) => addTransaction(e, 'expense'));
 
-        // Jalankan Inisialisasi
         updateUI();
         initFirebase();
 
