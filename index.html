@@ -24,7 +24,6 @@
         /* Custom styles for smooth transitions and scrollbars */
         body {
             font-family: 'Inter', sans-serif;
-            /* Transition for smooth dark mode switching */
             transition: background-color 0.3s ease, color 0.3s ease;
         }
         .fade-in {
@@ -51,7 +50,6 @@
         .table-container::-webkit-scrollbar-track {
             background: #f1f5f9;
         }
-        /* Dark mode scrollbar track */
         .dark .table-container::-webkit-scrollbar-track {
             background: #1e293b;
         }
@@ -59,7 +57,6 @@
             background: #cbd5e1;
             border-radius: 4px;
         }
-        /* Dark mode scrollbar thumb */
         .dark .table-container::-webkit-scrollbar-thumb {
             background: #475569;
         }
@@ -71,9 +68,8 @@
         }
     </style>
     
-    <!-- Dark Mode Initialization Script (Prevents flash of wrong theme) -->
+    <!-- Dark Mode Initialization Script -->
     <script>
-        // Check local storage or system preference on load
         if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
@@ -139,7 +135,6 @@
                 </div>
                 
                 <div class="flex items-center gap-2 sm:gap-3">
-                    
                     <!-- Dark Mode Toggle Button -->
                     <button id="theme-toggle" type="button" class="text-sm bg-black/20 hover:bg-black/30 backdrop-blur-sm p-1.5 rounded-lg transition-colors flex items-center justify-center h-8 w-8" title="Toggle Dark Mode">
                         <i id="theme-toggle-dark-icon" class="ph ph-moon hidden text-lg"></i>
@@ -200,13 +195,13 @@
 
             </div>
 
-            <!-- Grafik Pengeluaran (Chart) -->
+            <!-- Grafik Tren Pemasukan vs Pengeluaran (Line Chart) -->
             <div id="chart-container" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 mb-8 transition-all duration-300 hidden">
                 <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
-                    <i class="ph ph-pie-chart text-lg text-indigo-500"></i> Sebaran Pengeluaran Bulan Ini
+                    <i class="ph ph-chart-line text-lg text-indigo-500"></i> Tren Pemasukan & Pengeluaran Bulan Ini
                 </h3>
-                <div class="relative h-64 w-full flex justify-center">
-                    <canvas id="expenseChart"></canvas>
+                <div class="relative h-72 w-full flex justify-center">
+                    <canvas id="trendChart"></canvas>
                 </div>
             </div>
 
@@ -378,7 +373,6 @@
                     <i class="ph ph-pencil-simple text-2xl text-indigo-500"></i>
                     <h3 class="text-lg font-bold text-slate-800 dark:text-white">Edit Transaksi</h3>
                 </div>
-                <!-- Hidden inputs to store which item is being edited -->
                 <input type="hidden" id="edit-id">
                 <input type="hidden" id="edit-type">
                 <div class="space-y-4">
@@ -414,7 +408,6 @@
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, deleteDoc, updateDoc, onSnapshot, collection, addDoc, query, where, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // APP ID - IMPORTANT: Set back to 'demo-labarugi-app' so old data appears
         const appId = 'demo-labarugi-app';
         
         const firebaseConfig = {
@@ -432,7 +425,7 @@
         let pendingAction = null; 
         let transactions = { incomes: [], expenses: [] };
         let isLoginMode = true;
-        let expenseChartInstance = null; // Variable for our Pie Chart
+        let trendChartInstance = null; // Chart instance for Line Chart
 
         /* ============================
            DARK MODE TOGGLE LOGIC
@@ -441,7 +434,6 @@
         const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-        // Set initial icon based on theme
         if (document.documentElement.classList.contains('dark')) {
             themeToggleLightIcon.classList.remove('hidden');
         } else {
@@ -449,11 +441,9 @@
         }
 
         themeToggleBtn.addEventListener('click', function() {
-            // toggle icons
             themeToggleDarkIcon.classList.toggle('hidden');
             themeToggleLightIcon.classList.toggle('hidden');
 
-            // if set via local storage previously
             if (localStorage.getItem('color-theme')) {
                 if (localStorage.getItem('color-theme') === 'light') {
                     document.documentElement.classList.add('dark');
@@ -463,7 +453,6 @@
                     localStorage.setItem('color-theme', 'light');
                 }
             } else {
-                // if NOT set via local storage previously
                 if (document.documentElement.classList.contains('dark')) {
                     document.documentElement.classList.remove('dark');
                     localStorage.setItem('color-theme', 'light');
@@ -473,11 +462,17 @@
                 }
             }
 
-            // Memperbarui warna teks grafik secara realtime jika grafik sudah muncul
-            if (expenseChartInstance) {
+            // Update chart styling dynamically for dark/light mode
+            if (trendChartInstance) {
                 const isDark = document.documentElement.classList.contains('dark');
-                expenseChartInstance.options.plugins.legend.labels.color = isDark ? '#94a3b8' : '#475569';
-                expenseChartInstance.update();
+                const textColor = isDark ? '#94a3b8' : '#475569';
+                const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
+                trendChartInstance.options.plugins.legend.labels.color = textColor;
+                trendChartInstance.options.scales.x.ticks.color = textColor;
+                trendChartInstance.options.scales.y.ticks.color = textColor;
+                trendChartInstance.options.scales.x.grid.color = gridColor;
+                trendChartInstance.options.scales.y.grid.color = gridColor;
+                trendChartInstance.update();
             }
         });
 
@@ -520,7 +515,6 @@
         const modalCancelBtn = document.getElementById('modal-cancel-btn');
         const modalConfirmBtn = document.getElementById('modal-confirm-btn');
 
-        // DOM Elements - Edit Modal
         const editModal = document.getElementById('edit-modal');
         const editForm = document.getElementById('edit-form');
         const editDesc = document.getElementById('edit-desc');
@@ -579,13 +573,11 @@
            EDIT MODAL LOGIC
            ============================ */
         function openEditModal(id, type) {
-            // Cari data transaksi berdasarkan id dan tipenya
             const dataList = type === 'income' ? transactions.incomes : transactions.expenses;
             const item = dataList.find(t => t.id === id);
             
             if (!item) return;
 
-            // Injeksi Kategori sesuai tipe
             const catSelect = document.getElementById('edit-category');
             if (type === 'income') {
                 catSelect.innerHTML = `
@@ -603,14 +595,12 @@
                 `;
             }
 
-            // Isi nilai form dengan data yang ada
             editId.value = item.id;
             editType.value = type;
             catSelect.value = item.category || 'Lainnya';
             editDesc.value = item.desc;
             editAmount.value = item.amount;
 
-            // Tampilkan modal edit
             editModal.classList.remove('hidden');
             void editModal.offsetWidth; 
             editModal.classList.remove('opacity-0');
@@ -786,7 +776,6 @@
                     allDocs.push({ id: doc.id, ...doc.data() });
                 });
 
-                // (Urutkan ulang jika perlu, tapi query orderBy sudah menanganinya)
                 transactions.incomes = allDocs.filter(d => d.type === 'income');
                 transactions.expenses = allDocs.filter(d => d.type === 'expense');
 
@@ -810,7 +799,6 @@
 
             if (desc === '' || isNaN(amount) || amount <= 0) return;
 
-            // LANGSUNG kosongkan form & kembalikan fokus kursor sebelum diproses (UX lebih baik)
             descInput.value = '';
             amountInput.value = '';
             descInput.focus();
@@ -859,7 +847,6 @@
                         batch.delete(docRef);
                     }
                     
-                    // Eksekusi semua perintah hapus sekaligus
                     await batch.commit();
                 } catch(err) {
                     console.error("Error clearing data:", err);
@@ -873,61 +860,138 @@
         window.handleLogout = handleLogout;
 
         /* ============================
-           UI & CHART RENDER LOGIC
+           UI & LINE CHART RENDER LOGIC
            ============================ */
         
-        function updateChartUI(expenses) {
-            const ctx = document.getElementById('expenseChart').getContext('2d');
+        function updateChartUI(incomes, expenses) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
             const isDark = document.documentElement.classList.contains('dark');
-            const textColor = isDark ? '#94a3b8' : '#475569'; // Slate-400 (dark) or Slate-600 (light)
+            const textColor = isDark ? '#94a3b8' : '#475569';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
 
-            // Mengelompokkan pengeluaran berdasarkan kategori
-            const categoryTotals = {};
-            expenses.forEach(tx => {
-                const cat = tx.category || 'Lainnya';
-                categoryTotals[cat] = (categoryTotals[cat] || 0) + tx.amount;
-            });
+            // Gabungkan dan urutkan semua transaksi secara kronologis
+            const allTx = [...incomes, ...expenses].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
-            const labels = Object.keys(categoryTotals);
-            const data = Object.values(categoryTotals);
-            
             const chartContainer = document.getElementById('chart-container');
-            if (data.length === 0) {
-                chartContainer.classList.add('hidden'); // Sembunyikan jika tidak ada data
+            if (allTx.length === 0) {
+                chartContainer.classList.add('hidden');
                 return;
             } else {
-                chartContainer.classList.remove('hidden'); // Munculkan jika ada data
+                chartContainer.classList.remove('hidden');
             }
 
-            // Update grafik jika sudah ada, atau buat baru jika belum
-            if (expenseChartInstance) {
-                expenseChartInstance.data.labels = labels;
-                expenseChartInstance.data.datasets[0].data = data;
-                expenseChartInstance.options.plugins.legend.labels.color = textColor;
-                expenseChartInstance.update();
+            // Kelompokkan pemasukan dan pengeluaran per tanggal
+            const dateMap = new Map();
+
+            allTx.forEach(tx => {
+                let label = tx.date || 'Lainnya';
+                if (tx.createdAt) {
+                    const d = new Date(tx.createdAt);
+                    label = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+                }
+                
+                if (!dateMap.has(label)) {
+                    dateMap.set(label, { income: 0, expense: 0 });
+                }
+                
+                const current = dateMap.get(label);
+                if (tx.type === 'income') {
+                    current.income += tx.amount;
+                } else {
+                    current.expense += tx.amount;
+                }
+            });
+
+            const labels = Array.from(dateMap.keys());
+            const incomeData = labels.map(l => dateMap.get(l).income);
+            const expenseData = labels.map(l => dateMap.get(l).expense);
+
+            if (trendChartInstance) {
+                trendChartInstance.data.labels = labels;
+                trendChartInstance.data.datasets[0].data = incomeData;
+                trendChartInstance.data.datasets[1].data = expenseData;
+                trendChartInstance.options.plugins.legend.labels.color = textColor;
+                trendChartInstance.options.scales.x.ticks.color = textColor;
+                trendChartInstance.options.scales.y.ticks.color = textColor;
+                trendChartInstance.options.scales.x.grid.color = gridColor;
+                trendChartInstance.options.scales.y.grid.color = gridColor;
+                trendChartInstance.update();
             } else {
-                expenseChartInstance = new Chart(ctx, {
-                    type: 'doughnut',
+                trendChartInstance = new Chart(ctx, {
+                    type: 'line',
                     data: {
                         labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#64748b'],
-                            borderWidth: 0,
-                            hoverOffset: 6
-                        }]
+                        datasets: [
+                            {
+                                label: 'Pemasukan',
+                                data: incomeData,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                                fill: true,
+                                tension: 0.35,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: '#10b981'
+                            },
+                            {
+                                label: 'Pengeluaran',
+                                data: expenseData,
+                                borderColor: '#f43f5e',
+                                backgroundColor: 'rgba(244, 63, 94, 0.12)',
+                                fill: true,
+                                tension: 0.35,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: '#f43f5e'
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        cutout: '70%',
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
                         plugins: {
                             legend: {
-                                position: 'right',
+                                position: 'top',
                                 labels: {
                                     color: textColor,
-                                    font: { family: "'Inter', sans-serif", size: 12 },
-                                    padding: 20
+                                    font: { family: "'Inter', sans-serif", size: 12, weight: '500' },
+                                    usePointStyle: true,
+                                    padding: 15
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) label += ': ';
+                                        if (context.parsed.y !== null) {
+                                            label += formatRupiah(context.parsed.y);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: gridColor },
+                                ticks: { color: textColor, font: { family: "'Inter', sans-serif" } }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: gridColor },
+                                ticks: {
+                                    color: textColor,
+                                    font: { family: "'Inter', sans-serif" },
+                                    callback: function(value) {
+                                        if (value >= 1000000) return 'Rp ' + (value / 1000000) + ' Jt';
+                                        if (value >= 1000) return 'Rp ' + (value / 1000) + ' Rb';
+                                        return 'Rp ' + value;
+                                    }
                                 }
                             }
                         }
@@ -948,7 +1012,6 @@
             const formattedProfit = formatRupiah(Math.abs(netProfit));
             netProfitDisplay.innerText = (isNegative ? '- ' : '') + formattedProfit;
 
-            // Reset profit card classes (keeping structural & dark mode base classes)
             profitCard.className = 'bg-white dark:bg-slate-800 rounded-2xl shadow-sm border p-6 flex flex-col items-center justify-center relative overflow-hidden group transition-all duration-300 hover:shadow-md';
             profitBg.className = 'absolute -right-4 -top-4 w-24 h-24 rounded-full z-0 group-hover:scale-110 transition-transform duration-500';
             profitIcon.className = 'text-4xl mb-2 relative z-10 ph-fill';
@@ -976,8 +1039,8 @@
             renderTable(transactions.incomes, incomeList, 'income', incomeEmptyState, incomeCount);
             renderTable(transactions.expenses, expenseList, 'expense', expenseEmptyState, expenseCount);
             
-            // Render Pie Chart untuk pengeluaran
-            updateChartUI(transactions.expenses);
+            // Render Line Chart untuk perbandingan Pemasukan vs Pengeluaran
+            updateChartUI(transactions.incomes, transactions.expenses);
         }
 
         function renderTable(dataArray, listElement, type, emptyStateElement, countElement) {
