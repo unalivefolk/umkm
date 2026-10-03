@@ -311,8 +311,8 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, deleteDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Menggunakan id wallet-app untuk memisahkan data dari percobaan sebelumnya jika ada
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'wallet-app';
+        // Menggunakan id lama agar data yang sudah diinput sebelumnya kembali terbaca
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'demo-labarugi-app';
         
         // Konfigurasi Firebase Anda
         const firebaseConfig = {
