@@ -1010,7 +1010,6 @@
             const netProfit = totalIncome - totalExpense;
 
             // Hitung persentase margin keuntungan (Net Profit Margin)
-            // Rumus: (Laba Bersih / Total Pemasukan) * 100, jika totalIncome > 0
             let profitMargin = 0;
             if (totalIncome > 0) {
                 profitMargin = (netProfit / totalIncome) * 100;
@@ -1023,7 +1022,6 @@
             const formattedProfit = formatRupiah(Math.abs(netProfit));
             netProfitDisplay.innerText = (isNegative ? '- ' : '') + formattedProfit;
             
-            // Format tampilan persentase (maks 1 angka dibelakang koma jika ada desimal)
             const formattedMargin = profitMargin.toFixed(1).replace(/\.0$/, '');
             profitPercentageBadge.innerText = `Margin: ${isNegative ? '' : (profitMargin > 0 ? '+' : '')}${formattedMargin}%`;
 
@@ -1109,7 +1107,7 @@
         }
 
         incomeForm.addEventListener('submit', (e) => addTransaction(e, 'income'));
-        expenseForm.addEventListener('submit', (e) => addTransaction, (e) => addTransaction(e, 'expense'));
+        expenseForm.addEventListener('submit', (e) => addTransaction(e, 'expense'));
 
         updateUI();
         initFirebase();
