@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallet - Kelola Keuangan</title>
+    <title>Wallet - Kelola Keuangan & Modal Awal</title>
     <!-- Tailwind CSS for rapid styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -161,41 +161,84 @@
         <main class="flex-grow container mx-auto px-4 py-8 max-w-6xl">
             
             <!-- Dashboard / Ringkasan -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 
-                <!-- Total Pendapatan -->
-                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 flex items-center gap-5 hover:shadow-md transition-all duration-300">
-                    <div class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 p-4 rounded-xl">
-                        <i class="ph ph-trend-up text-3xl"></i>
+                <!-- Modal Awal -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5 flex flex-col justify-between hover:shadow-md transition-all duration-300 relative group">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 p-3 rounded-xl">
+                                <i class="ph ph-piggy-bank text-2xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Modal Awal</p>
+                                <h2 class="text-xl font-bold text-slate-800 dark:text-white tracking-tight" id="initial-capital-display">Rp 0</h2>
+                            </div>
+                        </div>
+                        <button onclick="openCapitalModal()" class="p-2 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all" title="Atur Modal Awal">
+                            <i class="ph ph-pencil-simple text-lg"></i>
+                        </button>
                     </div>
-                    <div>
-                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Pemasukan (Bulan Ini)</p>
-                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight" id="total-income-display">Rp 0</h2>
+                    <div class="text-[11px] text-slate-400 dark:text-slate-500 flex items-center justify-between border-t border-slate-100 dark:border-slate-700/60 pt-2">
+                        <span>Modal disiapkan</span>
+                        <button onclick="openCapitalModal()" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">Ubah Modal</button>
+                    </div>
+                </div>
+
+                <!-- Total Pendapatan -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5 flex flex-col justify-between hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 p-3 rounded-xl">
+                            <i class="ph ph-trend-up text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Pemasukan (Bulan Ini)</p>
+                            <h2 class="text-xl font-bold text-slate-800 dark:text-white tracking-tight" id="total-income-display">Rp 0</h2>
+                        </div>
+                    </div>
+                    <div class="text-[11px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-700/60 pt-2">
+                        <span>Penjualan & Layanan</span>
                     </div>
                 </div>
 
                 <!-- Total Pengeluaran -->
-                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 flex items-center gap-5 hover:shadow-md transition-all duration-300">
-                    <div class="bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 p-4 rounded-xl">
-                        <i class="ph ph-trend-down text-3xl"></i>
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5 flex flex-col justify-between hover:shadow-md transition-all duration-300">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 p-3 rounded-xl">
+                            <i class="ph ph-trend-down text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Pengeluaran (Bulan Ini)</p>
+                            <h2 class="text-xl font-bold text-slate-800 dark:text-white tracking-tight" id="total-expense-display">Rp 0</h2>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Pengeluaran (Bulan Ini)</p>
-                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight" id="total-expense-display">Rp 0</h2>
+                    <div class="text-[11px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-700/60 pt-2 flex justify-between items-center">
+                        <span>Pemakaian Modal</span>
+                        <span id="capital-used-percent" class="font-semibold text-rose-500">0%</span>
                     </div>
                 </div>
 
-                <!-- Laba / Rugi Bersih & Persentase Margin -->
-                <div id="profit-card" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 flex flex-col items-center justify-center relative overflow-hidden group transition-all duration-300">
-                    <div id="profit-bg" class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-slate-50 dark:bg-slate-700/50 z-0 group-hover:scale-110 transition-transform duration-500"></div>
-                    <div class="flex items-center gap-2 relative z-10 mb-1">
-                        <i id="profit-icon" class="ph ph-coins text-slate-400 dark:text-slate-500 text-2xl ph-fill"></i>
-                        <p id="profit-label" class="text-sm font-medium text-slate-500 dark:text-slate-400">Laba Bersih</p>
+                <!-- Sisa Saldo / Sisa Modal Kas -->
+                <div id="balance-card" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5 flex flex-col justify-between relative overflow-hidden group transition-all duration-300 hover:shadow-md">
+                    <div id="balance-bg" class="absolute -right-4 -top-4 w-20 h-20 rounded-full bg-slate-50 dark:bg-slate-700/50 z-0 group-hover:scale-110 transition-transform duration-500"></div>
+                    
+                    <div class="relative z-10 flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div id="balance-icon-bg" class="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 p-3 rounded-xl">
+                                <i id="balance-icon" class="ph ph-vault text-2xl"></i>
+                            </div>
+                            <div>
+                                <p id="balance-label" class="text-xs font-medium text-slate-500 dark:text-slate-400">Sisa Saldo Kas</p>
+                                <h2 class="text-xl font-bold text-slate-800 dark:text-white tracking-tight" id="remaining-balance-display">Rp 0</h2>
+                            </div>
+                        </div>
                     </div>
-                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white relative z-10 tracking-tight mb-1" id="net-profit-display">Rp 0</h2>
-                    <!-- Badge Persentase Margin Keuntungan -->
-                    <div id="profit-percentage-badge" class="relative z-10 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all">
-                        Margin: 0%
+                    
+                    <div class="relative z-10 text-[11px] border-t border-slate-100 dark:border-slate-700/60 pt-2 flex items-center justify-between">
+                        <span class="text-slate-500 dark:text-slate-400">Laba/Rugi: <strong id="net-profit-display" class="font-bold">Rp 0</strong></span>
+                        <span id="profit-percentage-badge" class="font-semibold px-2 py-0.5 rounded-full text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                            Margin: 0%
+                        </span>
                     </div>
                 </div>
 
@@ -371,6 +414,36 @@
         </div>
     </div>
 
+    <!-- Capital Modal Container (Input Modal Awal) -->
+    <div id="capital-modal" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center backdrop-blur-sm transition-opacity opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full mx-4 overflow-hidden transform scale-95 transition-all duration-300 border dark:border-slate-700">
+            <form id="capital-form" class="p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="bg-blue-100 dark:bg-blue-900/50 p-2.5 rounded-xl text-blue-600 dark:text-blue-400">
+                        <i class="ph ph-piggy-bank text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Modal Awal Kas</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Masukkan besaran dana modal awal usaha</p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label for="capital-amount-input" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Jumlah Modal (Rp)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500 font-medium">Rp</span>
+                            <input type="number" id="capital-amount-input" required min="0" placeholder="0" class="w-full pl-12 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:text-white transition-all text-sm">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" id="capital-cancel-btn" class="px-4 py-2.5 text-slate-600 dark:text-slate-400 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">Batal</button>
+                    <button type="submit" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">Simpan Modal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Edit Modal Container -->
     <div id="edit-modal" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center backdrop-blur-sm transition-opacity opacity-0">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full mx-4 overflow-hidden transform scale-95 transition-all duration-300 border dark:border-slate-700">
@@ -412,7 +485,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, deleteDoc, updateDoc, onSnapshot, collection, addDoc, query, where, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, deleteDoc, updateDoc, onSnapshot, collection, addDoc, query, where, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = 'demo-labarugi-app';
         
@@ -428,8 +501,10 @@
         let app, db, auth;
         let currentUser = null;
         let unsubscribe = null;
+        let unsubscribeSettings = null;
         let pendingAction = null; 
         let transactions = { incomes: [], expenses: [] };
+        let initialCapital = 0;
         let isLoginMode = true;
         let trendChartInstance = null;
 
@@ -500,13 +575,16 @@
         const expenseForm = document.getElementById('expense-form');
         const incomeList = document.getElementById('income-list');
         const expenseList = document.getElementById('expense-list');
+        const initialCapitalDisplay = document.getElementById('initial-capital-display');
         const totalIncomeDisplay = document.getElementById('total-income-display');
         const totalExpenseDisplay = document.getElementById('total-expense-display');
+        const remainingBalanceDisplay = document.getElementById('remaining-balance-display');
         const netProfitDisplay = document.getElementById('net-profit-display');
-        const profitCard = document.getElementById('profit-card');
-        const profitBg = document.getElementById('profit-bg');
-        const profitIcon = document.getElementById('profit-icon');
-        const profitLabel = document.getElementById('profit-label');
+        const capitalUsedPercent = document.getElementById('capital-used-percent');
+        const balanceCard = document.getElementById('balance-card');
+        const balanceBg = document.getElementById('balance-bg');
+        const balanceIconBg = document.getElementById('balance-icon-bg');
+        const balanceIcon = document.getElementById('balance-icon');
         const profitPercentageBadge = document.getElementById('profit-percentage-badge');
         const incomeEmptyState = document.getElementById('income-empty-state');
         const expenseEmptyState = document.getElementById('expense-empty-state');
@@ -520,6 +598,11 @@
         const modalIcon = document.getElementById('modal-icon');
         const modalCancelBtn = document.getElementById('modal-cancel-btn');
         const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+
+        const capitalModal = document.getElementById('capital-modal');
+        const capitalForm = document.getElementById('capital-form');
+        const capitalAmountInput = document.getElementById('capital-amount-input');
+        const capitalCancelBtn = document.getElementById('capital-cancel-btn');
 
         const editModal = document.getElementById('edit-modal');
         const editForm = document.getElementById('edit-form');
@@ -573,6 +656,47 @@
         modalConfirmBtn.addEventListener('click', () => {
             if (pendingAction) pendingAction();
             hideModal();
+        });
+
+        /* ============================
+           CAPITAL MODAL LOGIC
+           ============================ */
+        function openCapitalModal() {
+            capitalAmountInput.value = initialCapital > 0 ? initialCapital : '';
+            capitalModal.classList.remove('hidden');
+            void capitalModal.offsetWidth; 
+            capitalModal.classList.remove('opacity-0');
+            capitalModal.querySelector('div').classList.remove('scale-95');
+            setTimeout(() => capitalAmountInput.focus(), 100);
+        }
+
+        function closeCapitalModal() {
+            capitalModal.classList.add('opacity-0');
+            capitalModal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => { capitalModal.classList.add('hidden'); }, 300);
+        }
+
+        capitalCancelBtn.addEventListener('click', closeCapitalModal);
+
+        capitalForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newCapital = parseInt(capitalAmountInput.value);
+            if (isNaN(newCapital) || newCapital < 0) return;
+
+            initialCapital = newCapital;
+            updateUI();
+
+            if (currentUser && db) {
+                syncStatusUI.innerHTML = `<i class="ph ph-spinner-gap animate-spin"></i> <span class="hidden sm:inline">Menyimpan...</span>`;
+                try {
+                    const capitalDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'capital');
+                    await setDoc(capitalDocRef, { initialCapital: newCapital, updatedAt: Date.now() }, { merge: true });
+                    syncStatusUI.innerHTML = `<i class="ph ph-cloud-check text-emerald-300"></i> <span class="hidden sm:inline text-emerald-100">Tersimpan</span>`;
+                } catch (err) {
+                    console.error("Error saving initial capital:", err);
+                }
+            }
+            closeCapitalModal();
         });
 
         /* ============================
@@ -675,11 +799,13 @@
                 } else {
                     currentUser = null;
                     if(unsubscribe) unsubscribe();
+                    if(unsubscribeSettings) unsubscribeSettings();
                     appWrapper.classList.add('hidden');
                     appWrapper.classList.remove('flex');
                     authScreen.classList.remove('hidden');
                     
                     transactions = { incomes: [], expenses: [] };
+                    initialCapital = 0;
                     updateUI();
                 }
             });
@@ -763,7 +889,20 @@
 
         function setupRealtimeListener(uid) {
             if (unsubscribe) unsubscribe();
+            if (unsubscribeSettings) unsubscribeSettings();
 
+            // Realtime Listener Modal Awal
+            const capitalDocRef = doc(db, 'artifacts', appId, 'users', uid, 'settings', 'capital');
+            unsubscribeSettings = onSnapshot(capitalDocRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data().initialCapital !== undefined) {
+                    initialCapital = docSnap.data().initialCapital;
+                } else {
+                    initialCapital = 0;
+                }
+                updateUI();
+            });
+
+            // Realtime Listener Transaksi Bulan Ini
             const transRef = collection(db, 'artifacts', appId, 'users', uid, 'transactions');
             syncStatusUI.innerHTML = `<i class="ph ph-spinner-gap animate-spin"></i> <span class="hidden sm:inline">Memuat...</span>`;
 
@@ -841,7 +980,7 @@
         }
 
         async function clearAllData() {
-            showModal('Reset Data Bulan Ini', 'PERINGATAN: Semua data laba rugi di bulan ini akan dihapus permanen. Lanjutkan?', async () => {
+            showModal('Reset Data Bulan Ini', 'PERINGATAN: Semua data transaksi di bulan ini akan dihapus permanen. Lanjutkan?', async () => {
                 if (!currentUser || !db) return;
                 syncStatusUI.innerHTML = `<i class="ph ph-spinner-gap animate-spin"></i> <span class="hidden sm:inline">Mereset...</span>`;
                 try {
@@ -860,6 +999,7 @@
             }, true);
         }
 
+        window.openCapitalModal = openCapitalModal;
         window.openEditModal = openEditModal;
         window.deleteTransaction = deleteTransaction;
         window.clearAllData = clearAllData;
@@ -1008,6 +1148,16 @@
             const totalIncome = transactions.incomes.reduce((acc, curr) => acc + curr.amount, 0);
             const totalExpense = transactions.expenses.reduce((acc, curr) => acc + curr.amount, 0);
             const netProfit = totalIncome - totalExpense;
+            
+            // Perhitungan Sisa Saldo / Modal Kas
+            const remainingBalance = initialCapital + netProfit;
+
+            // Hitung persentase pemakaian modal awal oleh pengeluaran
+            let usedPercent = 0;
+            if (initialCapital > 0) {
+                usedPercent = (totalExpense / initialCapital) * 100;
+            }
+            capitalUsedPercent.innerText = initialCapital > 0 ? `${usedPercent.toFixed(1)}% modal` : '0%';
 
             // Hitung persentase margin keuntungan (Net Profit Margin)
             let profitMargin = 0;
@@ -1015,41 +1165,44 @@
                 profitMargin = (netProfit / totalIncome) * 100;
             }
 
+            initialCapitalDisplay.innerText = formatRupiah(initialCapital);
             totalIncomeDisplay.innerText = formatRupiah(totalIncome);
             totalExpenseDisplay.innerText = formatRupiah(totalExpense);
             
-            const isNegative = netProfit < 0;
-            const formattedProfit = formatRupiah(Math.abs(netProfit));
-            netProfitDisplay.innerText = (isNegative ? '- ' : '') + formattedProfit;
+            // Format Tampilan Sisa Saldo
+            const isBalanceNegative = remainingBalance < 0;
+            remainingBalanceDisplay.innerText = (isBalanceNegative ? '- ' : '') + formatRupiah(Math.abs(remainingBalance));
             
-            const formattedMargin = profitMargin.toFixed(1).replace(/\.0$/, '');
-            profitPercentageBadge.innerText = `Margin: ${isNegative ? '' : (profitMargin > 0 ? '+' : '')}${formattedMargin}%`;
+            // Format Tampilan Laba / Rugi
+            const isProfitNegative = netProfit < 0;
+            netProfitDisplay.innerText = (isProfitNegative ? '- ' : '+ ') + formatRupiah(Math.abs(netProfit));
+            netProfitDisplay.className = isProfitNegative ? 'text-rose-500 font-bold' : (netProfit > 0 ? 'text-emerald-500 font-bold' : 'text-slate-600 dark:text-slate-300 font-bold');
 
-            profitCard.className = 'bg-white dark:bg-slate-800 rounded-2xl shadow-sm border p-6 flex flex-col items-center justify-center relative overflow-hidden group transition-all duration-300 hover:shadow-md';
-            profitBg.className = 'absolute -right-4 -top-4 w-24 h-24 rounded-full z-0 group-hover:scale-110 transition-transform duration-500';
-            profitIcon.className = 'text-2xl ph-fill';
+            const formattedMargin = profitMargin.toFixed(1).replace(/\.0$/, '');
+            profitPercentageBadge.innerText = `Margin: ${isProfitNegative ? '' : (profitMargin > 0 ? '+' : '')}${formattedMargin}%`;
+
+            // Style untuk Kartu Sisa Saldo Kas
+            balanceCard.className = 'bg-white dark:bg-slate-800 rounded-2xl shadow-sm border p-5 flex flex-col justify-between relative overflow-hidden group transition-all duration-300 hover:shadow-md';
+            balanceBg.className = 'absolute -right-4 -top-4 w-20 h-20 rounded-full z-0 group-hover:scale-110 transition-transform duration-500';
             
-            if (netProfit > 0) {
-                profitCard.classList.add('border-emerald-200', 'dark:border-emerald-800/50');
-                profitBg.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20');
-                profitIcon.classList.add('text-emerald-500', 'dark:text-emerald-400', 'ph-smiley');
-                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-emerald-600 dark:text-emerald-400 tracking-tight mb-1';
-                profitLabel.innerText = "Laba Bersih (Untung)";
-                profitPercentageBadge.className = 'relative z-10 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 transition-all';
-            } else if (netProfit < 0) {
-                profitCard.classList.add('border-rose-200', 'dark:border-rose-800/50');
-                profitBg.classList.add('bg-rose-50', 'dark:bg-rose-900/20');
-                profitIcon.classList.add('text-rose-500', 'dark:text-rose-400', 'ph-smiley-sad');
-                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-rose-600 dark:text-rose-400 tracking-tight mb-1';
-                profitLabel.innerText = "Rugi Bersih";
-                profitPercentageBadge.className = 'relative z-10 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 transition-all';
+            if (remainingBalance > 0) {
+                balanceCard.classList.add('border-emerald-200', 'dark:border-emerald-800/50');
+                balanceBg.classList.add('bg-emerald-50', 'dark:bg-emerald-900/20');
+                balanceIconBg.className = 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 p-3 rounded-xl';
+                balanceIcon.className = 'ph ph-vault text-2xl';
+                remainingBalanceDisplay.className = 'text-xl font-bold relative z-10 text-emerald-600 dark:text-emerald-400 tracking-tight';
+            } else if (remainingBalance < 0) {
+                balanceCard.classList.add('border-rose-200', 'dark:border-rose-800/50');
+                balanceBg.classList.add('bg-rose-50', 'dark:bg-rose-900/20');
+                balanceIconBg.className = 'bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 p-3 rounded-xl';
+                balanceIcon.className = 'ph ph-warning text-2xl';
+                remainingBalanceDisplay.className = 'text-xl font-bold relative z-10 text-rose-600 dark:text-rose-400 tracking-tight';
             } else {
-                profitCard.classList.add('border-slate-100', 'dark:border-slate-700');
-                profitBg.classList.add('bg-slate-50', 'dark:bg-slate-700/50');
-                profitIcon.classList.add('text-slate-400', 'dark:text-slate-500', 'ph-coins');
-                netProfitDisplay.className = 'text-2xl font-bold relative z-10 text-slate-800 dark:text-white tracking-tight mb-1';
-                profitLabel.innerText = "Laba Bersih";
-                profitPercentageBadge.className = 'relative z-10 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all';
+                balanceCard.classList.add('border-slate-100', 'dark:border-slate-700');
+                balanceBg.classList.add('bg-slate-50', 'dark:bg-slate-700/50');
+                balanceIconBg.className = 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 p-3 rounded-xl';
+                balanceIcon.className = 'ph ph-vault text-2xl';
+                remainingBalanceDisplay.className = 'text-xl font-bold relative z-10 text-slate-800 dark:text-white tracking-tight';
             }
 
             renderTable(transactions.incomes, incomeList, 'income', incomeEmptyState, incomeCount);
